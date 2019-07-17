@@ -68,7 +68,7 @@ namespace FolderStructureCleaner
                         Directory.EnumerateDirectories(weekDir, "",SearchOption.TopDirectoryOnly).Count() == Directory.EnumerateFileSystemEntries(weekDir,"", SearchOption.TopDirectoryOnly).Count() &&
                         oldCount + content.Count() == toDelete.Count)
                     {
-                        toDelete.RemoveRange(oldCount, content.Count());
+                        //toDelete.RemoveRange(oldCount, content.Count());
                         toDelete.Add(weekDir);
                     }
                 }
@@ -80,7 +80,7 @@ namespace FolderStructureCleaner
         {
             foreach (var folder in folders)
             {
-                Directory.Delete(folder, true);
+                Directory.Delete(folder, false);
             }
         }
     }
