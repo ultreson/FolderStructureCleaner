@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -13,15 +14,17 @@ namespace FolderStructureCleaner
         {
             Console.WriteLine("Please input the current week number :");
             int currentWeek = int.Parse(Console.ReadLine());
-            //Console.WriteLine(currentWeek);
-            var toDelete = ListEmptyFolders(currentWeek);
+            Console.WriteLine("Pick a root directory");
+            string path = Console.ReadLine();
+            string[] toDelete = ListEmptyFolders(path, currentWeek);
             if (toDelete.Any())
             {
                 Console.WriteLine("Folders to delete: ");
-                foreach (var element in toDelete)
+                foreach (string element in toDelete)
                 {
                     Console.WriteLine("DEL " + element);
                 }
+                Console.WriteLine("Press any key to confirm the deletion");
                 Console.Read();
                 DeleteFoldersFromArray(toDelete);
             }
@@ -32,31 +35,29 @@ namespace FolderStructureCleaner
             Console.Read();
         }
 
-        static string[] ListEmptyFolders(int currentWeek)
+        static string[] ListEmptyFolders(string path, int currentWeek)
         {
-            var toDelete = new ArrayList();
-            Console.WriteLine("Pick a root directory");
-            String path = Console.ReadLine();
+            ArrayList toDelete = new ArrayList();
             if (!Directory.Exists(path))
             {
                 Console.WriteLine("Invalid root path.");
                 return null;
             }
-            var dirs = Directory.EnumerateDirectories(path, "??????", SearchOption.TopDirectoryOnly);
-            foreach (var dir in dirs)
+            IEnumerable<string> dirs = Directory.EnumerateDirectories(path, "??????", SearchOption.TopDirectoryOnly);
+            foreach (string dir in dirs)
             {
-                var weekDirs = Directory.EnumerateDirectories(dir, "semaine ??", SearchOption.TopDirectoryOnly);
-                var pastWeekDirs = weekDirs.Where(s => int.Parse(s.Split(' ', StringSplitOptions.None).Last()) < currentWeek);
-                foreach (var weekDir in pastWeekDirs)
+                IEnumerable<string> weekDirs = Directory.EnumerateDirectories(dir, "semaine ??", SearchOption.TopDirectoryOnly);
+                IEnumerable<string> pastWeekDirs = weekDirs.Where(s => int.Parse(s.Split(' ', StringSplitOptions.None).Last()) < currentWeek);
+                foreach (string weekDir in pastWeekDirs)
                 {
                     var content = Directory.EnumerateDirectories(weekDir);
                     int oldCount = toDelete.Count;
-                    foreach (var dayDirOrContent in content)
+                    foreach (string dayDirOrContent in content)
                     {
                         string dayDirOrContentName = dayDirOrContent.Split('\\').Last();
                         if (daysOfWeek.Contains(dayDirOrContentName))
                         {
-                            var subContent = Directory.EnumerateFileSystemEntries(dayDirOrContent);
+                            IEnumerable<string> subContent = Directory.EnumerateFileSystemEntries(dayDirOrContent);
                             if (!subContent.Any())
                             {
                                 toDelete.Add(dayDirOrContent);
@@ -78,9 +79,12 @@ namespace FolderStructureCleaner
 
         static void DeleteFoldersFromArray(string[] folders)
         {
-            foreach (var folder in folders)
+            foreach (string folder in folders)
             {
-                Directory.Delete(folder, false);
+                if (Directory.Exists(folder))
+                {
+                    Directory.Delete(folder, false);
+                }
             }
         }
     }
