@@ -11,18 +11,37 @@ namespace FolderStructureCleaner
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Please inout the current week number :");
+            Console.WriteLine("Please input the current week number :");
             int currentWeek = int.Parse(Console.ReadLine());
             //Console.WriteLine(currentWeek);
             var toDelete = ListEmptyFolders(currentWeek);
-            //DeleteFoldersFromList(toDelete);
+            if (toDelete.Any())
+            {
+                Console.WriteLine("Folders to delete: ");
+                foreach (var element in toDelete)
+                {
+                    Console.WriteLine("DEL " + element);
+                }
+                Console.Read();
+                DeleteFoldersFromArray(toDelete);
+            }
+            else
+            {
+                Console.WriteLine("Nothing to delete");
+            }
             Console.Read();
         }
 
         static string[] ListEmptyFolders(int currentWeek)
         {
             var toDelete = new ArrayList();
-            String path = "D:\\Alexi Tessier\\git\\FolderStructureCleaner\\FolderStructureCleaner\\bin\\Debug\\netcoreapp2.1\\test";
+            Console.WriteLine("Pick a root directory");
+            String path = Console.ReadLine();
+            if (!Directory.Exists(path))
+            {
+                Console.WriteLine("Invalid root path.");
+                return null;
+            }
             var dirs = Directory.EnumerateDirectories(path, "??????", SearchOption.TopDirectoryOnly);
             foreach (var dir in dirs)
             {
@@ -38,9 +57,9 @@ namespace FolderStructureCleaner
                         if (daysOfWeek.Contains(dayDirOrContentName))
                         {
                             var subContent = Directory.EnumerateFileSystemEntries(dayDirOrContent);
-                            if (subContent.Count() < 1)
+                            if (!subContent.Any())
                             {
-                                toDelete.Add(dayDirOrContent.ToString());
+                                toDelete.Add(dayDirOrContent);
                             }
                         }
                     }
@@ -50,16 +69,19 @@ namespace FolderStructureCleaner
                         oldCount + content.Count() == toDelete.Count)
                     {
                         toDelete.RemoveRange(oldCount, content.Count());
-                        toDelete.Add(weekDir.ToString());
+                        toDelete.Add(weekDir);
                     }
                 }
             }
-
-            foreach (var element in toDelete)
-            {
-                Console.WriteLine("DEL " + element);
-            }
             return (string[])toDelete.ToArray(typeof(string));
+        }
+
+        static void DeleteFoldersFromArray(string[] folders)
+        {
+            foreach (var folder in folders)
+            {
+                Directory.Delete(folder, true);
+            }
         }
     }
 }
