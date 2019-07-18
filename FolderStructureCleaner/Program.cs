@@ -11,7 +11,7 @@ namespace FolderStructureCleaner
         /// <summary>
         /// List of names for days of the week for matching directory names.
         /// </summary>
-        private static string[] daysOfWeek = new string[] {"lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"};
+        private static string[] daysOfWeek = new string[] {"dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"};
 
         /// <summary>
         /// Manages the inputs for the folder deletion.
